@@ -31,13 +31,13 @@ Note: The prompts and responses for Metaphor Systems are different. They include
 # Examples
 
 Here is the cppr clipboard shown on Metaphor Systems (to the far left).
-<img width="500" alt="image of ccpr at rest on Metaphor Systems" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/c4c40f7c-d2b3-43f9-a3b0-1b49b47c3067">
+<img width="750" alt="image of ccpr at rest on Metaphor Systems" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/c4c40f7c-d2b3-43f9-a3b0-1b49b47c3067">
 
 Clicking the cppr clipboard will copy the Prompt and Response to your Clipboard (if there is only one pair) or prompt the user to select one or all prompts & responses from their conversation.
-<img width="500" alt="image of ccpr in action on You.com" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/681f6fca-7311-4931-bc17-35fd41fd330f">
+<img width="750" alt="image of ccpr in action on You.com" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/681f6fca-7311-4931-bc17-35fd41fd330f">
 
 Here is another example of cppr showing the prompts to select for copying:
-<img width="999" alt="image of ccpr in action on Perplexity AI" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/9dd7bb90-d25b-43bc-acbf-f91f98dda2fc">
+<img width="750" alt="image of ccpr in action on Perplexity AI" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/9dd7bb90-d25b-43bc-acbf-f91f98dda2fc">
 
 
 # ?
