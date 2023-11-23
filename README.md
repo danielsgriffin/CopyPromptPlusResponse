@@ -37,7 +37,8 @@ Clicking the cppr clipboard will copy the Prompt and Response to your Clipboard 
 <img width="500" alt="image of ccpr in action on You.com" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/681f6fca-7311-4931-bc17-35fd41fd330f">
 
 Here is another example of cppr showing the prompts to select for copying:
-<img width="500" alt="image of ccpr in action on Perplexity AI" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/cac648c4-f67c-4e0b-8293-3abd368a4446">
+<img width="999" alt="image of ccpr in action on Perplexity AI" src="https://github.com/danielsgriffin/CopyPromptPlusResponse/assets/6070690/9dd7bb90-d25b-43bc-acbf-f91f98dda2fc">
+
 
 # ?
 Please tell me if you have any questions or suggestions!
