@@ -4,20 +4,26 @@
 // @version      0.1
 // @description  Copy markdown representation of prompt and response on generative search systems.
 // @author       danielsgriffin
-// @match        https://www.perplexity.ai/search/*
-// @match        https://you.com/search*
+// @match        https://www.perplexity.ai/*
+// @match        https://you.com/*
+// @match        https://metaphor.systems/*
 // @require      https://cdn.jsdelivr.net/npm/turndown@7.1.1/dist/turndown.js
 // ==/UserScript==
+
+
 
 (function () {
     'use strict';
 
     let perplexityMode = false;
     let youMode = false;
+    let metaphorMode = false;
 
     // Create a new Turndown service
     const turndownService = new TurndownService();
 
+
+    
     // Create a clickable icon
     const icon = document.createElement('button');
     icon.innerHTML = `<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;">cppr</div><svg xmlns="http://www.w3.org/2000/svg" width=100% height=100% fill="currentColor" class="bi bi-clipboard2-fill" viewBox="0 0 16 16">
@@ -29,13 +35,15 @@
     icon.style.cursor = 'pointer';
     icon.style.zIndex = '1000';
     icon.style.width = '75px';
+    icon.style.height = '75px';
     icon.style.padding = '0px';
     icon.style.background = 'transparent';
     icon.style.top = '50%';
     icon.style.left = '0';
     icon.style.transform = 'translate(0, -50%)';
-    icon.title = 'Copy Prompt and Response';
-    icon.setAttribute('aria-label', 'Copy Prompt and Response');
+    icon.title = 'Copy Prompt and Response to Clipboard'; // Tooltip for icon
+    // Set ARIA label for screen readers
+    icon.setAttribute('aria-label', 'Copy Prompt and Response to Clipboard');
 
     // Additional styles to reset or override website styles
     icon.style.border = 'none'; // Removes any border
@@ -43,6 +51,18 @@
     icon.style.outline = 'none'; // Removes outline that might appear on focus
     icon.style.margin = '0'; // Resets margin
     // Add any other styles you want to reset or override
+
+    // Add hover styles for icon
+    icon.style.transition = 'color 0.2s'; // Smooth transition for color
+    icon.addEventListener('mouseover', function () {
+        this.querySelector('svg').style.fill = '#404040';
+    });
+    icon.addEventListener('mouseout', function () {
+        this.querySelector('svg').style.fill = 'currentColor'; // Revert on mouse out
+    });
+
+    // Set tabindex for keyboard navigation
+    icon.tabIndex = 0;
 
     // Get a close button
     const closeButton = createCloseButton()
@@ -81,12 +101,17 @@
         copiedLabel.style.left = '50%';
         copiedLabel.style.padding = '10px';
         copiedLabel.style.transform = 'translate(-50%, -50%)';
-        copiedLabel.style.color = 'white';
-        copiedLabel.style.background = 'black';
         copiedLabel.style.fontSize = '80px';
         copiedLabel.style.borderRadius = '10px'; // Added this line to make the label slightly rounded
         copiedLabel.style.zIndex = '1000';
         copiedLabel.textContent = 'Copied!';
+
+
+        copiedLabel.style.color = 'black'; // Ensuring high contrast text
+        copiedLabel.style.backgroundColor = 'white'; // Against a white background
+        copiedLabel.setAttribute('role', 'status'); // ARIA role for status messages
+        copiedLabel.setAttribute('aria-live', 'assertive'); // ARIA live region to announce updates
+
         
         document.body.appendChild(copiedLabel);
 
@@ -106,13 +131,39 @@
         await navigator.clipboard.writeText(unescapedCombinedText);
     }
 
+    // --------------------------------------------------------------------------------------------------
+    // Metaphor Systems
+    // --------------------------------------------------------------------------------------------------
+    function getMetaphorPrompt() {
+        const textarea = document.querySelector("textarea.InputBox__TextareaAutosizeStyled-sc-1millua-1");
+        const autopromptSpan = document.querySelector("div > div > span:nth-of-type(2)");
+        return textarea.value + "\n\n## Autoprompted to: " + autopromptSpan.textContent;
+    }
 
-    // You.com specific
+    function getMetaphorResponse() {
+        const results = document.querySelectorAll(".SearchResultList__ResultListStyled-sc-1z03cvo-0 > div");
+
+        return Array.from(results).map((result, index) => {
+            // Extract the title from the specified div
+            const titleElement = result.querySelector(".SearchResultstyles__TitleLink-sc-jhxmbg-2");
+            const title = titleElement ? titleElement.textContent : "Title Not Found";
+
+            // Extract the link from the first anchor tag in the result
+            const linkElement = result.querySelector("a");
+            const link = linkElement ? linkElement.href : "Link Not Found";
+
+            return `${index + 1}. [${title}](${link})`;
+        }).join("\n");
+    }
+
+    // --------------------------------------------------------------------------------------------------
+    // You.com
+    // --------------------------------------------------------------------------------------------------
+
     function addYouFootnoteBrackets(string) {
         return string.replace(/(<span class="sc-51a47db1-0 sc-3690e738-0 dfZVVe gOsNCd">)(\d+)(<\/span>)/g, '$1[$2]$3');
     }
 
-    // You.com specific
     function cleanYouCitations(responseDiv) {
         console.log("cppr note: cleanYouCitations function called.");
         // Convert string to DOM element
@@ -191,7 +242,13 @@
                 });
                 i++;
             }
+        } else if (window.location.href.startsWith('https://metaphor.systems')) {
+            metaphorMode = true;
+            const promptText = getMetaphorPrompt();
+            const responseText = getMetaphorResponse();
+            promptArray.push({ prompt: promptText, response: responseText });
         }
+
         return promptArray;
     }
     function createCloseButton() {
@@ -274,13 +331,17 @@
     function createSelectAllButton(allPrompts, resolve) {
         const selectAllButton = document.createElement('button');
         selectAllButton.textContent = 'Select All';
-        selectAllButton.style.padding = '5px';
         selectAllButton.style.margin = '5px';
-        selectAllButton.style.background = 'black';
+        selectAllButton.style.padding = '10px 20px';
+        selectAllButton.style.marginTop = '10px'; // Adds space above the button
+        selectAllButton.style.background = '#0056b3'; // A blue that stands out
         selectAllButton.style.color = 'white';
-        selectAllButton.style.borderRadius = '5px';
         selectAllButton.style.cursor = 'pointer';
         selectAllButton.style.border = 'none';
+        selectAllButton.style.borderRadius = '5px';
+
+        // Set tabindex for keyboard navigation
+        selectAllButton.tabIndex = 0;
 
         selectAllButton.addEventListener('click', () => {
             console.log("Select All button clicked.");
@@ -295,11 +356,15 @@
     }
     function addHoverEffectToChildren(parentElement) {
         Array.from(parentElement.children).forEach(child => {
+            // Store the original background color
+            const originalBackgroundColor = child.style.background || ''; // Save the current background color
+
             child.addEventListener('mouseover', () => {
-                child.style.background = '#404040';
+                child.style.background = '#404040'; // New hover color
             });
             child.addEventListener('mouseout', () => {
-                child.style.background = 'black';
+                // Revert to the original background color
+                child.style.background = originalBackgroundColor;
             });
         });
     }
@@ -308,12 +373,13 @@
         const promptElement = document.createElement('p');
         promptElement.textContent = `${index + 1}. ${promptResponsePair.prompt}`;
         promptElement.style.cursor = 'pointer';
-        promptElement.style.color = 'white';
-        promptElement.style.background = 'black';
         promptElement.style.borderRadius = '10px';
-        promptElement.style.padding = '5px';
         promptElement.style.margin = '5px';
+        promptElement.style.marginBottom = '5px'; // Adds space between items
         promptElement.style.border = 'none';
+        promptElement.style.padding = '10px';
+        promptElement.style.color = '#DDD'; // Lighter text color for better readability
+        promptElement.style.background = '#333'; // Darker background for contrast
 
         return promptElement;
     }
